@@ -1,5 +1,5 @@
 import React from "react";
 
 export default function Home() {
-  return <div>Quero aprender tudo de novo</div>;
+  return <div>EU SOU FODA PORRA VSF</div>;
 }
