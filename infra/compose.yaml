@@ -4,6 +4,6 @@ services:
     ports: 
       - "5432:5432"
     env_file: 
-      - path: "../.env"
+      - path: "../.env.development"
         required: true
      
