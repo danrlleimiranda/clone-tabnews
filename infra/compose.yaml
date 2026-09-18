@@ -1,9 +1,8 @@
-services: 
-  database: 
+services:
+  database:
     image: "postgres:16-alpine3.18"
-    ports: 
+    ports:
       - "5432:5432"
-    env_file: 
+    env_file:
       - path: "../.env.development"
         required: true
-     
