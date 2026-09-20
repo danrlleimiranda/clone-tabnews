@@ -12,7 +12,7 @@ const customJestConfig = {
   moduleNameMapper: {
     "jsroot/io": "<rootDir>/node_modules/jsroot/",
   },
-  testTimeOut: 60000,
+  testTimeout: 60000,
 };
 
 module.exports = createJestConfig(customJestConfig);
