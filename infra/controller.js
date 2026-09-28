@@ -1,6 +1,13 @@
-import { MethodNotAllowedError, InternalServerError } from "infra/errors";
+import {
+  MethodNotAllowedError,
+  InternalServerError,
+  ValidationError,
+} from "infra/errors";
 
 export async function onErrorHandler(error, req, res) {
+  if (error instanceof ValidationError) {
+    return res.status(error.statusCode).json(error);
+  }
   const publicErrorObject = new InternalServerError({
     statusCode: error.statusCode,
     cause: error,
