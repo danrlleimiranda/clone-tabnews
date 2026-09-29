@@ -1,17 +1,19 @@
 import { createRouter } from "next-connect";
 import { onErrorHandler, onNoMatchHandler } from "infra/controller";
-import { retrieveDatabaseStatus } from "models/status";
+import user from "models/user";
 
 const router = createRouter();
 
 router.get(getHandler);
 
 export default router.handler({
-  onNoMatch: onNoMatchHandler,
   onError: onErrorHandler,
+  onNoMatch: onNoMatchHandler,
 });
 
 async function getHandler(req, res) {
-  const databaseStatus = await retrieveDatabaseStatus();
-  return res.status(200).json(databaseStatus);
+  const username = req.query.username;
+
+  const userFound = await user.findOneByUsername(username);
+  return res.status(200).json(userFound);
 }
