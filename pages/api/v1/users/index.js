@@ -4,7 +4,7 @@ import { create } from "models/user";
 
 const router = createRouter();
 
-router.post(postHandler).patch(patchHandler);
+router.post(postHandler);
 
 export default router.handler({
   onError: onErrorHandler,
@@ -17,5 +17,3 @@ async function postHandler(req, res) {
 
   return res.status(userResponse?.status).json(userResponse.data);
 }
-
-async function patchHandler(req, res) {}
