@@ -75,3 +75,24 @@ export class ValidationError extends Error {
     };
   }
 }
+export class NotFoundError extends Error {
+  constructor({ cause, message, action }) {
+    super(message || "Dado não encontrado", {
+      cause,
+    });
+    this.action =
+      action || "Verifique se os parâmetros inseridos estão corretos.";
+    this.name = "NotFoundError";
+    this.statusCode = 404;
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      action: this.action,
+      message: this.message,
+      cause: this.cause,
+      status_code: this.statusCode,
+    };
+  }
+}
