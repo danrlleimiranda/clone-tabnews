@@ -4,16 +4,16 @@ import user from "models/user";
 
 const router = createRouter();
 
-router.post(postHandler);
+router.get(getHandler);
 
 export default router.handler({
   onError: onErrorHandler,
   onNoMatch: onNoMatchHandler,
 });
 
-async function postHandler(req, res) {
-  const userInputValues = req.body;
-  const userResponse = await user.create(userInputValues);
+async function getHandler(req, res) {
+  const username = req.query.username;
 
-  return res.status(userResponse?.status).json(userResponse.data);
+  const userFound = await user.findOneByUsername(username);
+  return res.status(200).json(userFound);
 }

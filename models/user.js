@@ -1,7 +1,7 @@
 import database from "infra/database";
-import { ValidationError } from "infra/errors";
+import { ValidationError, NotFoundError } from "infra/errors";
 
-export async function create(userInputValues) {
+async function create(userInputValues) {
   if (!userInputValues) {
     throw new ValidationError({
       message: "O input informado está vazio",
@@ -66,3 +66,38 @@ async function validateUniqueUsername(username) {
     });
   }
 }
+
+async function findOneByUsername(username) {
+  const userFound = await runSelectQuery(username);
+  return userFound;
+
+  async function runSelectQuery(username) {
+    const results = await database.query({
+      text: `
+      SELECT
+       id, username, email, created_at, updated_at
+      FROM
+        users
+      WHERE
+        LOWER(username) = LOWER($1)
+      LIMIT 1
+        `,
+      values: [username],
+    });
+
+    if (results.rowCount === 0) {
+      throw new NotFoundError({
+        action: "Verifique se o username está digitado corretamente",
+        message: "O username informado não foi encontrado no sistema",
+      });
+    }
+    return results.rows[0];
+  }
+}
+
+const user = {
+  findOneByUsername,
+  create,
+};
+
+export default user;
