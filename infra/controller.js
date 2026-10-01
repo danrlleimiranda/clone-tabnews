@@ -13,6 +13,7 @@ export async function onErrorHandler(error, req, res) {
   if (error instanceof NotFoundError) {
     return res.status(error.statusCode).json(error);
   }
+
   const publicErrorObject = new InternalServerError({
     statusCode: error.statusCode,
     cause: error,
