@@ -13,7 +13,6 @@ export default router.handler({
 
 async function getHandler(req, res) {
   const pendingMigrations = await migrator.listPendingMigrations();
-  console.log(pendingMigrations);
   return res.status(200).json(pendingMigrations);
 }
 

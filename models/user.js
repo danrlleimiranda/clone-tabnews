@@ -1,6 +1,6 @@
 import database from "infra/database";
 import { ValidationError, NotFoundError } from "infra/errors";
-
+import password from "./password";
 async function create(userInputValues) {
   if (!userInputValues) {
     throw new ValidationError({
@@ -11,6 +11,7 @@ async function create(userInputValues) {
 
   await validateUniqueEmail(userInputValues.email);
   await validateUniqueUsername(userInputValues.username);
+  const hashedPassword = await hashPasswordInObject(userInputValues);
 
   const newUser = await database.query({
     text: `
@@ -23,7 +24,7 @@ async function create(userInputValues) {
       `,
     values: [
       userInputValues.username,
-      userInputValues.password,
+      hashedPassword,
       userInputValues.email.toLowerCase(),
     ],
   });
@@ -49,10 +50,11 @@ async function validateUniqueEmail(email) {
   if (user.rowCount > 0) {
     throw new ValidationError({
       message: "O email informado já está sendo utilizado",
-      action: "Utilize outro email para realizar o cadastro.",
+      action: "Utilize outro email para esta operação.",
     });
   }
 }
+
 async function validateUniqueUsername(username) {
   const user = await database.query({
     text: "SELECT username FROM users WHERE LOWER(username) = LOWER($1)",
@@ -62,9 +64,14 @@ async function validateUniqueUsername(username) {
   if (user.rowCount > 0) {
     throw new ValidationError({
       message: "O username informado já está sendo utilizado",
-      action: "Utilize outro username para realizar o cadastro.",
+      action: "Utilize outro username para esta operação.",
     });
   }
+}
+
+async function hashPasswordInObject(userInputValues) {
+  const hashedPassword = await password.hash(userInputValues.password);
+  return hashedPassword;
 }
 
 async function findOneByUsername(username) {
@@ -75,7 +82,7 @@ async function findOneByUsername(username) {
     const results = await database.query({
       text: `
       SELECT
-       id, username, email, created_at, updated_at
+       id, username, email, password, created_at, updated_at
       FROM
         users
       WHERE
@@ -95,9 +102,56 @@ async function findOneByUsername(username) {
   }
 }
 
+async function update(username, userInputValues) {
+  const user = await findOneByUsername(username);
+
+  if ("username" in userInputValues) {
+    await validateUniqueUsername(userInputValues.username);
+  }
+  if ("email" in userInputValues) {
+    await validateUniqueEmail(userInputValues.email);
+  }
+
+  if ("password" in userInputValues) {
+    const newPassword = await hashPasswordInObject(userInputValues);
+    userInputValues.password = newPassword;
+  }
+
+  const infoUser = { ...user, ...userInputValues };
+
+  const updatedUser = await runUpdateQuery(infoUser);
+
+  async function runUpdateQuery(infoUser) {
+    const updatedUser = await database.query({
+      text: `
+      UPDATE
+       users
+      SET
+       username = $1,
+       email = $2,
+       password = $3,
+       updated_at = timezone('utc', now())
+      WHERE id = $4
+      RETURNING
+        *`,
+      values: [
+        infoUser.username,
+        infoUser.email,
+        infoUser.password,
+        infoUser.id,
+      ],
+    });
+
+    return updatedUser.rows[0];
+  }
+
+  return updatedUser;
+}
+
 const user = {
   findOneByUsername,
   create,
+  update,
 };
 
 export default user;

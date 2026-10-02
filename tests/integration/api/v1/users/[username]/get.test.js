@@ -10,19 +10,11 @@ beforeAll(async () => {
 describe("GET /api/v1/users/[username]", () => {
   describe("Anonymous user", () => {
     test("With exact case match", async () => {
-      const response = await fetch("http://localhost:3000/api/v1/users", {
-        method: "POST",
-        body: JSON.stringify({
-          username: "mesmocase",
-          email: "email@gmail.com",
-          password: "senha123",
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
+      await orchestrator.createUser({
+        username: "mesmocase",
+        email: "email@gmail.com",
+        password: "senha123",
       });
-
-      expect(response.status).toBe(201);
       const username = "mesmocase";
       const response2 = await fetch(
         `http://localhost:3000/api/v1/users/${username}`
@@ -30,12 +22,13 @@ describe("GET /api/v1/users/[username]", () => {
 
       expect(response2.status).toBe(200);
 
-      const response2Body = await response.json();
+      const response2Body = await response2.json();
 
       expect(response2Body).toEqual({
         id: response2Body.id,
         username: "mesmocase",
         email: "email@gmail.com",
+        password: response2Body.password,
         created_at: response2Body.created_at,
         updated_at: response2Body.updated_at,
       });
@@ -46,20 +39,11 @@ describe("GET /api/v1/users/[username]", () => {
     });
 
     test("With case mismatch", async () => {
-      const response = await fetch("http://localhost:3000/api/v1/users", {
-        method: "POST",
-        body: JSON.stringify({
-          username: "CaseDiferente",
-          email: "diferente@gmail.com",
-          password: "senha123",
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
+      await orchestrator.createUser({
+        username: "CaseDiferente",
+        email: "diferente@gmail.com",
+        password: "senha123",
       });
-
-      expect(response.status).toBe(201);
-      console.log(await response.json());
 
       const username = "casediferente";
       const response2 = await fetch(
@@ -70,12 +54,11 @@ describe("GET /api/v1/users/[username]", () => {
 
       const response2Body = await response2.json();
 
-      console.log(response2Body);
-
       expect(response2Body).toEqual({
         id: response2Body.id,
         username: "CaseDiferente",
         email: "diferente@gmail.com",
+        password: response2Body.password,
         created_at: response2Body.created_at,
         updated_at: response2Body.updated_at,
       });
