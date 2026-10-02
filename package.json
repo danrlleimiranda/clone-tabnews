@@ -41,6 +41,7 @@
   "devDependencies": {
     "@commitlint/cli": "21.2.3",
     "@commitlint/config-conventional": "21.2.3",
+    "@faker-js/faker": "9.7.0",
     "commitizen": "4.3.2",
     "concurrently": "10.0.5",
     "cz-conventional-changelog": "3.3.0",

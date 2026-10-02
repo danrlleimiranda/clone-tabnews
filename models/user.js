@@ -82,7 +82,7 @@ async function findOneByUsername(username) {
     const results = await database.query({
       text: `
       SELECT
-       id, username, email, created_at, updated_at
+       id, username, email, password, created_at, updated_at
       FROM
         users
       WHERE
@@ -105,33 +105,47 @@ async function findOneByUsername(username) {
 async function update(username, userInputValues) {
   const user = await findOneByUsername(username);
 
-  const toBeUpdated = {};
-
   if ("username" in userInputValues) {
     await validateUniqueUsername(userInputValues.username);
-    toBeUpdated.username = userInputValues.username;
   }
   if ("email" in userInputValues) {
     await validateUniqueEmail(userInputValues.email);
-    toBeUpdated.email = userInputValues.email;
   }
 
-  const updatedUser = await runUpdateQuery(username, toBeUpdated);
+  if ("password" in userInputValues) {
+    const newPassword = await hashPasswordInObject(userInputValues);
+    userInputValues.password = newPassword;
+  }
 
-  async function runUpdateQuery(username, toBeUpdated) {
+  const infoUser = { ...user, ...userInputValues };
+
+  const updatedUser = await runUpdateQuery(infoUser);
+
+  async function runUpdateQuery(infoUser) {
     const updatedUser = await database.query({
-      text: "UPDATE users SET username = $1, email = $2 WHERE username = $3 RETURNING *",
+      text: `
+      UPDATE
+       users
+      SET
+       username = $1,
+       email = $2,
+       password = $3,
+       updated_at = timezone('utc', now())
+      WHERE id = $4
+      RETURNING
+        *`,
       values: [
-        toBeUpdated.username ?? user.email,
-        toBeUpdated.email ?? user.email,
-        username,
+        infoUser.username,
+        infoUser.email,
+        infoUser.password,
+        infoUser.id,
       ],
     });
 
-    return updatedUser;
+    return updatedUser.rows[0];
   }
 
-  return updatedUser.rows[0];
+  return updatedUser;
 }
 
 const user = {
