@@ -1,5 +1,9 @@
 import { createRouter } from "next-connect";
-import { onNoMatchHandler, onErrorHandler } from "infra/controller";
+import {
+  onNoMatchHandler,
+  onErrorHandler,
+  clearSessionCookie,
+} from "infra/controller";
 import authentication from "models/authentication";
 import session, { EXPIRATION_IN_MILLISECONDS } from "models/session";
 
@@ -7,7 +11,7 @@ import * as cookie from "cookie";
 
 const router = createRouter();
 
-router.post(postHandler);
+router.post(postHandler).delete(deleteHandler);
 
 export default router.handler({
   onNoMatch: onNoMatchHandler,
@@ -33,4 +37,16 @@ async function postHandler(req, res) {
   res.setHeader("Set-Cookie", setCookie);
 
   return res.status(201).json(newSession);
+}
+
+async function deleteHandler(req, res) {
+  const sessionToken = req.cookies.session_id;
+
+  const sessionObject = await session.findOneValidByToken(sessionToken);
+
+  const expiredSession = await session.expireById(sessionObject.id);
+
+  clearSessionCookie(res);
+
+  return res.status(200).json(expiredSession);
 }
