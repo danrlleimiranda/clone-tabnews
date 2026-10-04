@@ -36,11 +36,13 @@ async function runPendingMigrations() {
 async function createUser(userObject) {
   const randomUsername = faker.internet.username().replace(/[_.-]/g, "");
   const randomEmail = faker.internet.email();
-  await user.create({
+  const createdUser = await user.create({
     username: userObject.username || randomUsername,
     email: userObject.email || randomEmail,
     password: userObject.password || "senhavalida",
   });
+
+  return createdUser.data;
 }
 
 const orchestrator = {
