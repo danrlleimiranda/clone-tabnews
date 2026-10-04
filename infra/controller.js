@@ -3,19 +3,19 @@ import {
   InternalServerError,
   ValidationError,
   NotFoundError,
+  UnauthorizedError,
 } from "infra/errors";
 
 export async function onErrorHandler(error, req, res) {
-  if (error instanceof ValidationError) {
-    return res.status(error.statusCode).json(error);
-  }
-
-  if (error instanceof NotFoundError) {
+  if (
+    error instanceof ValidationError ||
+    error instanceof NotFoundError ||
+    error instanceof UnauthorizedError
+  ) {
     return res.status(error.statusCode).json(error);
   }
 
   const publicErrorObject = new InternalServerError({
-    statusCode: error.statusCode,
     cause: error,
   });
 

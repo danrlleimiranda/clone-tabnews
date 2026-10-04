@@ -10,7 +10,9 @@ async function hash(password) {
 }
 
 async function compare(providedPassword, storedPassword) {
-  return await bcryptjs.compare(providedPassword, storedPassword);
+  const pepper = process.env.PASSWORD_PEPPER;
+  const spicyPassword = providedPassword + pepper;
+  return await bcryptjs.compare(spicyPassword, storedPassword);
 }
 
 const password = { hash, compare };

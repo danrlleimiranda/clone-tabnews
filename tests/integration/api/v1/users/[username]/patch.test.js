@@ -138,7 +138,6 @@ describe("PATCH /api/v1/users/[username]", () => {
       );
 
       const patchResponseBody = await patchResponse.json();
-      console.log(patchResponse);
 
       expect(patchResponse.status).toBe(200);
 
