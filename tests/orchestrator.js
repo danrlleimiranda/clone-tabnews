@@ -88,8 +88,6 @@ async function getLastEmail() {
 
   const emailTextBody = await emailTextResponse.text();
 
-  console.log(emailTextBody);
-
   lastEmail.text = emailTextBody;
   return lastEmail;
 }
