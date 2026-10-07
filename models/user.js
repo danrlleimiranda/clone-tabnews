@@ -32,21 +32,11 @@ async function create(userInputValues) {
     ],
   });
 
-  return {
-    status: 201,
-    data: {
-      id: newUser.rows[0].id,
-      username: newUser.rows[0].username,
-      email: newUser.rows[0].email,
-      features: newUser.rows[0].features,
-      password: newUser.rows[0].password,
-      created_at: newUser.rows[0].created_at,
-      updated_at: newUser.rows[0].updated_at,
-    },
-  };
-  function injectDefaultFeaturesObject(userInputValues) {
-    userInputValues.features = ["read:activation_token"];
-  }
+  return newUser.rows[0];
+}
+
+function injectDefaultFeaturesObject(userInputValues) {
+  userInputValues.features = ["read:activation_token"];
 }
 
 async function validateUniqueEmail(email) {

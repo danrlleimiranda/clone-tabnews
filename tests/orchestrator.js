@@ -62,7 +62,7 @@ async function createUser(userObject) {
     password: userObject.password || "senhavalida",
   });
 
-  return createdUser.data;
+  return createdUser;
 }
 
 async function createSession(userId) {
@@ -81,6 +81,10 @@ async function getLastEmail() {
   const emails = await response.json();
 
   const lastEmail = emails.pop();
+
+  if (!lastEmail) {
+    return null;
+  }
 
   const emailTextResponse = await fetch(
     `${emailHttpUrl}/messages/${lastEmail.id}.plain`
