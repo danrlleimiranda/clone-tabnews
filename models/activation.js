@@ -27,24 +27,11 @@ async function create(userId) {
   }
 }
 
-async function sendEmailToUser(user, activationToken) {
-  await email.send({
-    from: "DanTab <contato@dantab.com.br>",
-    to: user.email,
-    subject: "Ative seu cadastro!",
-    text: `${user.username}, clique no link abaixo para ativar sua conta.
-${webserver.origin}/cadastro/ativar/${activationToken.id}
-
-Atenciosamente
-Equipe DanTab`,
-  });
-}
-
-async function findOneByUserId(userId) {
-  const validSession = await runSelectQuery(userId);
+async function findOneValidById(tokenId) {
+  const validSession = await runSelectQuery(tokenId);
   return validSession;
 
-  async function runSelectQuery(userId) {
+  async function runSelectQuery(tokenId) {
     const results = await database.query({
       text: `
       SELECT 
@@ -52,10 +39,12 @@ async function findOneByUserId(userId) {
       FROM
         user_activation_tokens
       WHERE
-        user_id = $1
+        id = $1
+      AND used_at IS NULL
+      AND expires_at > now()
       LIMIT
         1`,
-      values: [userId],
+      values: [tokenId],
     });
 
     if (!results.rowCount) {
@@ -69,6 +58,19 @@ async function findOneByUserId(userId) {
   }
 }
 
-const activation = { sendEmailToUser, create, findOneByUserId };
+async function sendEmailToUser(user, activationToken) {
+  await email.send({
+    from: "DanTab <contato@dantab.com.br>",
+    to: user.email,
+    subject: "Ative seu cadastro!",
+    text: `${user.username}, clique no link abaixo para ativar sua conta.
+${webserver.origin}/cadastro/ativar/${activationToken.id}
+
+Atenciosamente
+Equipe DanTab`,
+  });
+}
+
+const activation = { sendEmailToUser, create, findOneValidById };
 
 export default activation;

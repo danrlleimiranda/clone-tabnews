@@ -1,3 +1,4 @@
+import webserver from "infra/webserver";
 import activation from "models/activation";
 import orchestrator from "tests/orchestrator";
 
@@ -7,9 +8,8 @@ beforeAll(async () => {
   await orchestrator.runPendingMigrations();
   await orchestrator.deleteAllMails();
 });
-
+let createdUserResponseBody;
 describe("Use case: Registration Flow (all successfull)", () => {
-  let createUserResponseBody;
   test("Create user account", async () => {
     const response = await fetch("http://localhost:3000/api/v1/users", {
       method: "POST",
@@ -34,13 +34,16 @@ describe("Use case: Registration Flow (all successfull)", () => {
       created_at: responseBody.created_at,
       updated_at: responseBody.updated_at,
     });
-    createUserResponseBody = responseBody;
+    createdUserResponseBody = responseBody;
   });
   test("Receive activation email", async () => {
     const lastEmail = await orchestrator.getLastEmail();
+    const tokenRegex = /[0-9a-fA-F-]{36}/;
+    const token = lastEmail.text.match(tokenRegex)[0];
+    const activationToken = await activation.findOneValidById(token);
 
-    const activationToken = await activation.findOneByUserId(
-      createUserResponseBody.id
+    expect(lastEmail.text).toContain(
+      `${webserver.origin}/cadastro/ativar/${token}`
     );
 
     expect(lastEmail.sender).toBe("<contato@dantab.com.br>");
@@ -48,6 +51,8 @@ describe("Use case: Registration Flow (all successfull)", () => {
     expect(lastEmail.subject).toBe("Ative seu cadastro!");
     expect(lastEmail.text).toContain("danzin");
     expect(lastEmail.text).toContain(activationToken.id);
+    expect(createdUserResponseBody.id).toBe(activationToken.user_id);
+    expect(activationToken.used_at).toBe(null);
   });
   test("Active account", () => {});
   test("Login", () => {});
