@@ -1,7 +1,7 @@
 import email from "infra/email";
 import database from "infra/database";
 import webserver from "infra/webserver";
-import { UnauthorizedError } from "infra/errors";
+import { NotFoundError, UnauthorizedError } from "infra/errors";
 
 const EXPIRATION_IN_MILLISECONDS = 60 * 15 * 1000;
 async function create(userId) {
@@ -71,6 +71,35 @@ Equipe DanTab`,
   });
 }
 
-const activation = { sendEmailToUser, create, findOneValidById };
+async function update(tokenId) {
+  const activatedToken = await runUpdateQuery(tokenId);
+  return activatedToken;
+
+  async function runUpdateQuery(tokenId) {
+    const response = await database.query({
+      text: `UPDATE
+              user_activation_tokens
+            SET
+              used_at = now()
+            WHERE
+              id = $1
+            RETURNING
+              *`,
+      values: [tokenId],
+    });
+
+    if (response.rowCount === 0) {
+      throw new NotFoundError({
+        message:
+          "O token de ativação utilizado não foi encontrado no sistema ou expirou.",
+        action: "faça um novo cadastro.",
+      });
+    }
+
+    return response.rows[0];
+  }
+}
+
+const activation = { sendEmailToUser, create, findOneValidById, update };
 
 export default activation;

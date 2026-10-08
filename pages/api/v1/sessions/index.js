@@ -20,7 +20,7 @@ export default router.handler({
 
 async function postHandler(req, res) {
   const userInputValues = req.body;
-  const authenticatedUser = await authentication.getAuthemticatedUser(
+  const authenticatedUser = await authentication.getAuthenticatedUser(
     userInputValues.email,
     userInputValues.password
   );
