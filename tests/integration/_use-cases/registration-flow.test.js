@@ -71,6 +71,21 @@ describe("Use case: Registration Flow (all successfull)", () => {
     const activatedUser = await user.findOneByUsername("danzin");
     expect(activatedUser.features).toEqual(["create:session"]);
   });
-  test("Login", () => {});
+  test("Login", async () => {
+    const sessionResponse = await fetch(
+      `http://localhost:3000/api/v1/sessions`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          email: "danzin@gmail.com",
+          password: "senha123",
+        }),
+      }
+    );
+
+    expect(sessionResponse.status).toBe(201);
+    const sessionResponseBody = await sessionResponse.json();
+    expect(sessionResponseBody.user_id).toBe(createdUserResponseBody.id);
+  });
   test("Get user information", () => {});
 });

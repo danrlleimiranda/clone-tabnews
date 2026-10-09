@@ -148,8 +148,6 @@ describe("POST /api/v1/sessions", () => {
           httpOnly: true,
         },
       });
-
-      
     });
   });
 });
