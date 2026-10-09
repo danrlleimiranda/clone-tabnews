@@ -162,6 +162,7 @@ async function update(username, userInputValues) {
   if ("username" in userInputValues) {
     await validateUniqueUsername(userInputValues.username);
   }
+
   if ("email" in userInputValues) {
     await validateUniqueEmail(userInputValues.email);
   }
@@ -184,14 +185,16 @@ async function update(username, userInputValues) {
        username = $1,
        email = $2,
        password = $3,
+       features = $4,
        updated_at = timezone('utc', now())
-      WHERE id = $4
+      WHERE id = $5
       RETURNING
         *`,
       values: [
         infoUser.username,
         infoUser.email,
         infoUser.password,
+        infoUser.features,
         infoUser.id,
       ],
     });
@@ -202,12 +205,41 @@ async function update(username, userInputValues) {
   return updatedUser;
 }
 
+async function setFeatures(userId, features) {
+  const updatedUser = await runUpdateQuery(userId, features);
+  return updatedUser;
+
+  async function runUpdateQuery(userId, features) {
+    const response = await database.query({
+      text: `UPDATE
+              users
+            SET
+              features = $2
+            WHERE
+              id = $1
+            RETURNING
+              *`,
+      values: [userId, features],
+    });
+
+    if (response.rowCount === 0) {
+      throw new NotFoundError({
+        message: "O usuário não foi encontrado no sistema.",
+        action: "faça um novo cadastro.",
+      });
+    }
+
+    return response.rows[0];
+  }
+}
+
 const user = {
   findOneByUsername,
   create,
   update,
   findOneByEmail,
   findOneById,
+  setFeatures,
 };
 
 export default user;

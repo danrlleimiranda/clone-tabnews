@@ -65,7 +65,7 @@ describe("Use case: Registration Flow (all successfull)", () => {
 
     expect(activationResponse.status).toBe(200);
 
-    const activationResponseBody = activationResponse.json();
+    const activationResponseBody = await activationResponse.json();
 
     expect(Date.parse(activationResponseBody.used_at)).not.toBeNaN();
     const activatedUser = await user.findOneByUsername("danzin");
