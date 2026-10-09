@@ -62,7 +62,7 @@ async function createUser(userObject) {
     password: userObject.password || "senhavalida",
   });
 
-  return createdUser.data;
+  return createdUser;
 }
 
 async function createSession(userId) {
@@ -82,16 +82,25 @@ async function getLastEmail() {
 
   const lastEmail = emails.pop();
 
+  if (!lastEmail) {
+    return null;
+  }
+
   const emailTextResponse = await fetch(
     `${emailHttpUrl}/messages/${lastEmail.id}.plain`
   );
 
   const emailTextBody = await emailTextResponse.text();
 
-  console.log(emailTextBody);
-
   lastEmail.text = emailTextBody;
   return lastEmail;
+}
+
+function extractUUID(emailTextBody) {
+  const tokenRegex = /[0-9a-fA-F-]{36}/;
+  const token = emailTextBody.match(tokenRegex)[0];
+
+  return token;
 }
 
 const orchestrator = {
@@ -102,6 +111,7 @@ const orchestrator = {
   createSession,
   deleteAllMails,
   getLastEmail,
+  extractUUID,
 };
 
 export default orchestrator;

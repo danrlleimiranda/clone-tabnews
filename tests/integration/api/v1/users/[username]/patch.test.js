@@ -145,6 +145,7 @@ describe("PATCH /api/v1/users/[username]", () => {
         id: patchResponseBody.id,
         email: "newuser1@gmail.com",
         username: "newuser1",
+        features: ["read:activation_token"],
         created_at: patchResponseBody.created_at,
         updated_at: patchResponseBody.updated_at,
         password: patchResponseBody.password,

@@ -12,33 +12,31 @@ async function create(userInputValues) {
   await validateUniqueEmail(userInputValues.email);
   await validateUniqueUsername(userInputValues.username);
   const hashedPassword = await hashPasswordInObject(userInputValues);
+  injectDefaultFeaturesObject(userInputValues);
 
   const newUser = await database.query({
     text: `
       INSERT INTO
         users
-          (username, password, email)
+          (username, password, email, features)
       VALUES
-          ($1, $2, $3)
-      RETURNING *
+          ($1, $2, $3, $4)
+      RETURNING
+      *
       `,
     values: [
       userInputValues.username,
       hashedPassword,
       userInputValues.email.toLowerCase(),
+      userInputValues.features,
     ],
   });
 
-  return {
-    status: 201,
-    data: {
-      id: newUser.rows[0].id,
-      username: newUser.rows[0].username,
-      email: newUser.rows[0].email,
-      created_at: newUser.rows[0].created_at,
-      updated_at: newUser.rows[0].updated_at,
-    },
-  };
+  return newUser.rows[0];
+}
+
+function injectDefaultFeaturesObject(userInputValues) {
+  userInputValues.features = ["read:activation_token"];
 }
 
 async function validateUniqueEmail(email) {
@@ -82,7 +80,7 @@ async function findOneById(id) {
     const results = await database.query({
       text: `
       SELECT
-       id, username, email, password, created_at, updated_at
+       *
       FROM
         users
       WHERE
@@ -110,7 +108,7 @@ async function findOneByUsername(username) {
     const results = await database.query({
       text: `
       SELECT
-       id, username, email, password, created_at, updated_at
+        *
       FROM
         users
       WHERE
@@ -131,6 +129,7 @@ async function findOneByUsername(username) {
 }
 
 async function findOneByEmail(email) {
+  console.log(email);
   const userFound = await runSelectQuery(email);
   return userFound;
 
@@ -138,7 +137,7 @@ async function findOneByEmail(email) {
     const results = await database.query({
       text: `
       SELECT
-       id, username, email, password, created_at, updated_at
+       *
       FROM
         users
       WHERE
@@ -147,7 +146,7 @@ async function findOneByEmail(email) {
         `,
       values: [email],
     });
-
+    console.log(results.rows);
     if (results.rowCount === 0) {
       throw new NotFoundError({
         action: "Verifique se o email está digitado corretamente",
@@ -164,6 +163,7 @@ async function update(username, userInputValues) {
   if ("username" in userInputValues) {
     await validateUniqueUsername(userInputValues.username);
   }
+
   if ("email" in userInputValues) {
     await validateUniqueEmail(userInputValues.email);
   }
@@ -186,14 +186,16 @@ async function update(username, userInputValues) {
        username = $1,
        email = $2,
        password = $3,
+       features = $4,
        updated_at = timezone('utc', now())
-      WHERE id = $4
+      WHERE id = $5
       RETURNING
         *`,
       values: [
         infoUser.username,
         infoUser.email,
         infoUser.password,
+        infoUser.features,
         infoUser.id,
       ],
     });
@@ -204,12 +206,41 @@ async function update(username, userInputValues) {
   return updatedUser;
 }
 
+async function setFeatures(userId, features) {
+  const updatedUser = await runUpdateQuery(userId, features);
+  return updatedUser;
+
+  async function runUpdateQuery(userId, features) {
+    const response = await database.query({
+      text: `UPDATE
+              users
+            SET
+              features = $2
+            WHERE
+              id = $1
+            RETURNING
+              *`,
+      values: [userId, features],
+    });
+
+    if (response.rowCount === 0) {
+      throw new NotFoundError({
+        message: "O usuário não foi encontrado no sistema.",
+        action: "faça um novo cadastro.",
+      });
+    }
+
+    return response.rows[0];
+  }
+}
+
 const user = {
   findOneByUsername,
   create,
   update,
   findOneByEmail,
   findOneById,
+  setFeatures,
 };
 
 export default user;
