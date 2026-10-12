@@ -224,4 +224,49 @@ describe("PATCH /api/v1/users/[username]", () => {
       });
     });
   });
+  describe("Privileged user", () => {
+    test("With update:user:others targeting defaultUser", async () => {
+      const privilegedUser = await orchestrator.createUser({});
+      const activatedPrivilegedUser = await orchestrator.activateUser(
+        privilegedUser
+      );
+
+      await orchestrator.addFeaturesToUser(privilegedUser, [
+        "update:user:others",
+      ]);
+      const privilegedUserSession = await orchestrator.createSession(
+        activatedPrivilegedUser.id
+      );
+
+      const defaultUser = await orchestrator.createUser({});
+
+      const patchResponse = await fetch(
+        `http://localhost:3000/api/v1/users/${defaultUser.username}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify({
+            username: "alteradoporprivilegiado",
+          }),
+          headers: {
+            "Content-Type": "application/json",
+            Cookie: `session_id=${privilegedUserSession.token}`,
+          },
+        }
+      );
+
+      const patchResponseBody = await patchResponse.json();
+
+      expect(patchResponse.status).toBe(200);
+
+      expect(patchResponseBody).toEqual({
+        id: defaultUser.id,
+        email: defaultUser.email,
+        password: defaultUser.password,
+        created_at: patchResponseBody.created_at,
+        features: defaultUser.features,
+        updated_at: patchResponseBody.updated_at,
+        username: patchResponseBody.username,
+      });
+    });
+  });
 });

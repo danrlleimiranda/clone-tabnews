@@ -233,6 +233,34 @@ async function setFeatures(userId, features) {
   }
 }
 
+async function addFeatures(userId, features) {
+  const updatedUser = await runUpdateQuery(userId, features);
+  return updatedUser;
+
+  async function runUpdateQuery(userId, features) {
+    const response = await database.query({
+      text: `UPDATE
+              users
+            SET
+              features = array_cat(features, $2)
+            WHERE
+              id = $1
+            RETURNING
+              *`,
+      values: [userId, features],
+    });
+
+    if (response.rowCount === 0) {
+      throw new NotFoundError({
+        message: "O usuário não foi encontrado no sistema.",
+        action: "faça um novo cadastro.",
+      });
+    }
+
+    return response.rows[0];
+  }
+}
+
 const user = {
   findOneByUsername,
   create,
@@ -240,6 +268,7 @@ const user = {
   findOneByEmail,
   findOneById,
   setFeatures,
+  addFeatures,
 };
 
 export default user;
