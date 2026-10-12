@@ -96,6 +96,27 @@ export class NotFoundError extends Error {
     };
   }
 }
+export class ForbiddenError extends Error {
+  constructor({ cause, message, action }) {
+    super(message || "Acesso negado", {
+      cause,
+    });
+    this.action =
+      action || "Verifique as features necessárias antes de continuar.";
+    this.name = "ForbiddenError";
+    this.statusCode = 403;
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      action: this.action,
+      message: this.message,
+      cause: this.cause,
+      status_code: this.statusCode,
+    };
+  }
+}
 export class UnauthorizedError extends Error {
   constructor({ cause, message, action }) {
     super(message || "Usuário não autenticado", {

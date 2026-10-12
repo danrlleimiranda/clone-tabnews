@@ -1,11 +1,16 @@
 import { createRouter } from "next-connect";
-import { onNoMatchHandler, onErrorHandler } from "infra/controller";
+import {
+  onNoMatchHandler,
+  onErrorHandler,
+  injectAnonymousOrUser,
+  canRequest,
+} from "infra/controller";
 
 import activation from "models/activation";
 
 const router = createRouter();
-
-router.patch(patchHandler);
+router.use(injectAnonymousOrUser);
+router.patch(canRequest("read:activation_token"), patchHandler);
 
 export default router.handler({
   onNoMatch: onNoMatchHandler,

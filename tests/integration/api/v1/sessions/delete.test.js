@@ -96,6 +96,7 @@ describe("DELETE /api/v1/sessions", () => {
 
       const createdUser = await orchestrator.createUser({});
 
+      await orchestrator.activateUser(createdUser);
       const sessionObject = await orchestrator.createSession(createdUser.id);
 
       jest.useRealTimers();

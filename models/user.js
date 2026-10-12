@@ -129,7 +129,7 @@ async function findOneByUsername(username) {
 }
 
 async function findOneByEmail(email) {
-  console.log(email);
+  email;
   const userFound = await runSelectQuery(email);
   return userFound;
 
@@ -146,7 +146,6 @@ async function findOneByEmail(email) {
         `,
       values: [email],
     });
-    console.log(results.rows);
     if (results.rowCount === 0) {
       throw new NotFoundError({
         action: "Verifique se o email está digitado corretamente",

@@ -3,13 +3,16 @@ import {
   onErrorHandler,
   onNoMatchHandler,
   setSessionCookie,
+  canRequest,
+  injectAnonymousOrUser,
 } from "infra/controller";
 import session from "models/session";
 import user from "models/user";
 
 const router = createRouter();
 
-router.get(getHandler);
+router.use(injectAnonymousOrUser);
+router.get(canRequest("read:session"), getHandler);
 
 export default router.handler({
   onError: onErrorHandler,

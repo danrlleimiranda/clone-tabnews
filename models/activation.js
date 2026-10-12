@@ -1,10 +1,11 @@
 import email from "infra/email";
 import database from "infra/database";
 import webserver from "infra/webserver";
-import { NotFoundError, UnauthorizedError } from "infra/errors";
+import { ForbiddenError, NotFoundError } from "infra/errors";
 import user from "models/user";
+import authorization from "./authorization";
 
-const EXPIRATION_IN_MILLISECONDS = 60 * 15 * 1000;
+export const EXPIRATION_IN_MILLISECONDS = 60 * 15 * 1000;
 async function create(userId) {
   const expiresAt = new Date(Date.now() + EXPIRATION_IN_MILLISECONDS);
 
@@ -49,9 +50,9 @@ async function findOneValidById(tokenId) {
     });
 
     if (!results.rowCount) {
-      throw new UnauthorizedError({
-        message: "Usuário não possui token de ativação.",
-        action: "Verifique se este usuário está logado e tente novamente.",
+      throw new NotFoundError({
+        message: "O token de ativação utilizado não foi encontrado no sistema.",
+        action: "Faça um novo cadastro.",
       });
     }
 
@@ -103,7 +104,20 @@ async function markTokenAsUsed(tokenId) {
 }
 
 async function activateUserByUserId(userId) {
-  const updatedUser = await user.setFeatures(userId, ["create:session"]);
+  const userToActivate = await user.findOneById(userId);
+
+  if (!authorization.can(userToActivate, "read:activation_token")) {
+    throw new ForbiddenError({
+      message: "Você não pode mais utilizar tokens de ativação.",
+      action: "Entre em contato com o suporte.",
+    });
+  }
+
+  const updatedUser = await user.setFeatures(userId, [
+    "create:session",
+    "read:session",
+    "update:user",
+  ]);
   return updatedUser;
 }
 

@@ -12,6 +12,7 @@ beforeAll(async () => {
 describe("Use case: Registration Flow (all successfull)", () => {
   let createdUserResponseBody;
   let activatedTokenId;
+
   test("Create user account", async () => {
     const response = await fetch("http://localhost:3000/api/v1/users", {
       method: "POST",
@@ -38,6 +39,7 @@ describe("Use case: Registration Flow (all successfull)", () => {
     });
     createdUserResponseBody = responseBody;
   });
+
   test("Receive activation email", async () => {
     const lastEmail = await orchestrator.getLastEmail();
     const token = orchestrator.extractUUID(lastEmail.text);
@@ -55,6 +57,7 @@ describe("Use case: Registration Flow (all successfull)", () => {
     expect(createdUserResponseBody.id).toBe(activationToken.user_id);
     expect(activationToken.used_at).toBe(null);
   });
+
   test("Active account", async () => {
     const activationResponse = await fetch(
       `http://localhost:3000/api/v1/activations/${activatedTokenId}`,
@@ -69,8 +72,9 @@ describe("Use case: Registration Flow (all successfull)", () => {
 
     expect(Date.parse(activationResponseBody.used_at)).not.toBeNaN();
     const activatedUser = await user.findOneByUsername("danzin");
-    expect(activatedUser.features).toEqual(["create:session"]);
+    expect(activatedUser.features).toEqual(["create:session", "read:session"]);
   });
+
   test("Login", async () => {
     const sessionResponse = await fetch(
       `http://localhost:3000/api/v1/sessions`,
@@ -80,6 +84,9 @@ describe("Use case: Registration Flow (all successfull)", () => {
           email: "danzin@gmail.com",
           password: "senha123",
         }),
+        headers: {
+          "Content-Type": "application/json",
+        },
       }
     );
 
@@ -87,5 +94,6 @@ describe("Use case: Registration Flow (all successfull)", () => {
     const sessionResponseBody = await sessionResponse.json();
     expect(sessionResponseBody.user_id).toBe(createdUserResponseBody.id);
   });
+
   test("Get user information", () => {});
 });
