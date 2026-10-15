@@ -7,6 +7,7 @@ import {
 } from "infra/controller";
 
 import activation from "models/activation";
+import authorization from "models/authorization";
 
 const router = createRouter();
 router.use(injectAnonymousOrUser);
@@ -19,10 +20,18 @@ export default router.handler({
 
 async function patchHandler(req, res) {
   const tokenId = req.query.token_id;
+  const userTryingToPatch = req.context.user;
   const validActivationtoken = await activation.findOneValidById(tokenId);
 
   const usedToken = await activation.markTokenAsUsed(tokenId);
 
   await activation.activateUserByUserId(validActivationtoken.user_id);
-  return res.status(200).json(usedToken);
+
+  const secureOutputValues = authorization.filterOutput(
+    userTryingToPatch,
+    "read:activation_token",
+    usedToken
+  );
+
+  return res.status(200).json(secureOutputValues);
 }

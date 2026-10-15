@@ -215,12 +215,10 @@ describe("PATCH /api/v1/users/[username]", () => {
 
       expect(patchResponseBody).toEqual({
         id: patchResponseBody.id,
-        email: "newuser1@gmail.com",
         username: "newuser1",
         features: ["create:session", "read:session", "update:user"],
         created_at: patchResponseBody.created_at,
         updated_at: patchResponseBody.updated_at,
-        password: patchResponseBody.password,
       });
     });
   });
@@ -260,8 +258,6 @@ describe("PATCH /api/v1/users/[username]", () => {
 
       expect(patchResponseBody).toEqual({
         id: defaultUser.id,
-        email: defaultUser.email,
-        password: defaultUser.password,
         created_at: patchResponseBody.created_at,
         features: defaultUser.features,
         updated_at: patchResponseBody.updated_at,

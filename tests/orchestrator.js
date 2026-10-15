@@ -109,7 +109,7 @@ async function activateUser(user) {
 }
 
 async function addFeaturesToUser(userObject, features) {
-  await user.addFeatures(userObject.id, features);
+  return await user.addFeatures(userObject.id, features);
 }
 
 const orchestrator = {

@@ -22,9 +22,16 @@ export default router.handler({
 
 async function getHandler(req, res) {
   const username = req.query.username;
+  const contextUser = req.context.user;
 
   const userFound = await user.findOneByUsername(username);
-  return res.status(200).json(userFound);
+
+  const secureOutputValues = authorization.filterOutput(
+    contextUser,
+    "read:user",
+    userFound
+  );
+  return res.status(200).json(secureOutputValues);
 }
 async function patchHandler(req, res) {
   const username = req.query.username;
@@ -43,5 +50,11 @@ async function patchHandler(req, res) {
 
   const updatedUser = await user.update(username, userInputValues);
 
-  return res.status(200).json(updatedUser);
+  const secureOutputValues = authorization.filterOutput(
+    userTryingToPatch,
+    "read:user",
+    updatedUser
+  );
+
+  return res.status(200).json(secureOutputValues);
 }
