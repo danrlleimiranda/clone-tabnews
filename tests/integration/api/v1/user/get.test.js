@@ -15,6 +15,8 @@ describe("GET /api/v1/user", () => {
     test("With valid session", async () => {
       const createdUser = await orchestrator.createUser({});
 
+      const activatedUser = await orchestrator.activateUser(createdUser);
+
       const sessionObject = await orchestrator.createSession(createdUser.id);
       const response = await fetch("http://localhost:3000/api/v1/user", {
         headers: {
@@ -33,9 +35,10 @@ describe("GET /api/v1/user", () => {
         id: responseBody.id,
         username: createdUser.username,
         email: createdUser.email,
+        features: ["create:session", "read:session", "update:user"],
         password: responseBody.password,
         created_at: responseBody.created_at,
-        updated_at: responseBody.updated_at,
+        updated_at: activatedUser.updated_at.toISOString(),
       });
       expect(version(responseBody.id)).toBe(4);
       expect(Date.parse(responseBody.created_at)).not.toBeNaN();
@@ -67,6 +70,7 @@ describe("GET /api/v1/user", () => {
         },
       });
     });
+
     test("With session expiring in 15 days", async () => {
       const EXPIRATION_IN_FIFTEEN_DAYS_IN_MILLISECONDS =
         60 * 60 * 24 * 15 * 1000;
@@ -75,7 +79,7 @@ describe("GET /api/v1/user", () => {
       });
 
       const createdUser = await orchestrator.createUser({});
-
+      const activatedUser = await orchestrator.activateUser(createdUser);
       const sessionObject = await orchestrator.createSession(createdUser.id);
 
       jest.useRealTimers();
@@ -91,9 +95,10 @@ describe("GET /api/v1/user", () => {
         id: responseBody.id,
         username: createdUser.username,
         email: createdUser.email,
+        features: ["create:session", "read:session", "update:user"],
         password: responseBody.password,
         created_at: responseBody.created_at,
-        updated_at: responseBody.updated_at,
+        updated_at: activatedUser.updated_at.toISOString(),
       });
       expect(version(responseBody.id)).toBe(4);
       expect(Date.parse(responseBody.created_at)).not.toBeNaN();
