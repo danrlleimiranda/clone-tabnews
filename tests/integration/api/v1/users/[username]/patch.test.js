@@ -107,14 +107,18 @@ describe("PATCH /api/v1/users/[username]", () => {
     });
 
     test("With userb targeting usera", async () => {
-      await orchestrator.createUser({
+      const user1 = await orchestrator.createUser({
         username: "usera",
         password: "senha123",
       });
+
+      await orchestrator.addFeaturesToUser(user1, ["update:user"]);
       const user2 = await orchestrator.createUser({
         username: "userb",
         password: "senha123",
       });
+
+      await orchestrator.addFeaturesToUser(user1, ["update:user"]);
 
       const activatedUser2 = await orchestrator.activateUser(user2);
       const session2 = await orchestrator.createSession(activatedUser2.id);
@@ -232,11 +236,15 @@ describe("PATCH /api/v1/users/[username]", () => {
       await orchestrator.addFeaturesToUser(privilegedUser, [
         "update:user:others",
       ]);
+
       const privilegedUserSession = await orchestrator.createSession(
         activatedPrivilegedUser.id
       );
 
       const defaultUser = await orchestrator.createUser({});
+      const updatedUser = await orchestrator.addFeaturesToUser(defaultUser, [
+        "read:user",
+      ]);
 
       const patchResponse = await fetch(
         `http://localhost:3000/api/v1/users/${defaultUser.username}`,
@@ -259,7 +267,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       expect(patchResponseBody).toEqual({
         id: defaultUser.id,
         created_at: patchResponseBody.created_at,
-        features: defaultUser.features,
+        features: updatedUser.features,
         updated_at: patchResponseBody.updated_at,
         username: patchResponseBody.username,
       });
