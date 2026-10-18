@@ -33,11 +33,18 @@ async function getHandler(req, res) {
 }
 
 async function postHandler(req, res) {
+  const authenticatedUser = req.context.user;
   const migratedMigrations = await migrator.runPendingMigrations();
 
   if (migratedMigrations.length > 0) {
     return res.status(201).json(migratedMigrations);
   }
 
-  return res.status(200).json(migratedMigrations);
+  const outputSecureValues = authorization.filterOutput(
+    authenticatedUser,
+    "create:migration",
+    migratedMigrations
+  );
+
+  return res.status(200).json(outputSecureValues);
 }

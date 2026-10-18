@@ -21,7 +21,6 @@ describe("models/authorization.js", () => {
 
     test("with valid user and known feature", async () => {
       const createdUser = { features: ["create:user"] };
-      console.log(createdUser);
       expect(authorization.can(createdUser, "create:user")).toBe(true);
     });
   });
