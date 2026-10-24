@@ -1,5 +1,6 @@
 import orchestrator from "tests/orchestrator";
 import webserver from "infra/webserver";
+import user from "models/user";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -225,6 +226,10 @@ describe("PATCH /api/v1/users/[username]", () => {
         created_at: patchResponseBody.created_at,
         updated_at: patchResponseBody.updated_at,
       });
+      const updatedUser = await user.findOneByEmail("newuser1@gmail.com");
+
+      expect(updatedUser).toBeDefined();
+      expect(updatedUser).toHaveProperty("email", "newuser1@gmail.com");
     });
   });
   describe("Privileged user", () => {
