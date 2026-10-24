@@ -1,4 +1,6 @@
 import orchestrator from "tests/orchestrator";
+import webserver from "infra/webserver";
+import user from "models/user";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -10,7 +12,7 @@ describe("PATCH /api/v1/users/[username]", () => {
   describe("Anonymous user", () => {
     test("Can't a update a user", async () => {
       const patchResponse = await fetch(
-        "http://localhost:3000/api/v1/users/newuser",
+        `${webserver.origin}/api/v1/users/newuser`,
         {
           method: "PATCH",
           body: JSON.stringify({
@@ -20,7 +22,7 @@ describe("PATCH /api/v1/users/[username]", () => {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       const patchResponseBody = await patchResponse.json();
@@ -41,16 +43,16 @@ describe("PATCH /api/v1/users/[username]", () => {
       const username = "nonexistent";
       const createdUser = await orchestrator.createUser({});
       const activatedUser = await orchestrator.activateUser(createdUser);
-      const session = await orchestrator.createSession(activatedUser.id);
+      const session = await orchestrator.createSession(activatedUser);
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/${username}`,
+        `${webserver.origin}/api/v1/users/${username}`,
         {
           method: "PATCH",
           headers: {
             Cookie: `session_id=${session.token}`,
           },
-        }
+        },
       );
 
       expect(response.status).toBe(404);
@@ -78,10 +80,10 @@ describe("PATCH /api/v1/users/[username]", () => {
       });
 
       const activatedUser2 = await orchestrator.activateUser(user2);
-      const session2 = await orchestrator.createSession(activatedUser2.id);
+      const session2 = await orchestrator.createSession(activatedUser2);
 
       const patchResponse = await fetch(
-        "http://localhost:3000/api/v1/users/user2",
+        `${webserver.origin}/api/v1/users/user2`,
         {
           method: "PATCH",
           body: JSON.stringify({
@@ -91,7 +93,7 @@ describe("PATCH /api/v1/users/[username]", () => {
             "Content-Type": "application/json",
             Cookie: `session_id=${session2.token}`,
           },
-        }
+        },
       );
 
       const patchResponseBody = await patchResponse.json();
@@ -121,10 +123,10 @@ describe("PATCH /api/v1/users/[username]", () => {
       await orchestrator.addFeaturesToUser(user1, ["update:user"]);
 
       const activatedUser2 = await orchestrator.activateUser(user2);
-      const session2 = await orchestrator.createSession(activatedUser2.id);
+      const session2 = await orchestrator.createSession(activatedUser2);
 
       const patchResponse = await fetch(
-        "http://localhost:3000/api/v1/users/usera",
+        `${webserver.origin}/api/v1/users/usera`,
         {
           method: "PATCH",
           body: JSON.stringify({
@@ -134,7 +136,7 @@ describe("PATCH /api/v1/users/[username]", () => {
             "Content-Type": "application/json",
             Cookie: `session_id=${session2.token}`,
           },
-        }
+        },
       );
 
       const patchResponseBody = await patchResponse.json();
@@ -160,10 +162,10 @@ describe("PATCH /api/v1/users/[username]", () => {
       });
 
       const activatedUser2 = await orchestrator.activateUser(createduser2);
-      const session2 = await orchestrator.createSession(activatedUser2.id);
+      const session2 = await orchestrator.createSession(activatedUser2);
 
       const patchResponse = await fetch(
-        `http://localhost:3000/api/v1/users/${createduser2.username}`,
+        `${webserver.origin}/api/v1/users/${createduser2.username}`,
         {
           method: "PATCH",
           body: JSON.stringify({
@@ -173,7 +175,7 @@ describe("PATCH /api/v1/users/[username]", () => {
             "Content-Type": "application/json",
             Cookie: `session_id=${session2.token}`,
           },
-        }
+        },
       );
 
       const patchResponseBody = await patchResponse.json();
@@ -196,10 +198,10 @@ describe("PATCH /api/v1/users/[username]", () => {
       });
 
       const activatedUser = await orchestrator.activateUser(createdUser);
-      const session = await orchestrator.createSession(activatedUser.id);
+      const session = await orchestrator.createSession(activatedUser);
 
       const patchResponse = await fetch(
-        "http://localhost:3000/api/v1/users/newuser",
+        `${webserver.origin}/api/v1/users/newuser`,
         {
           method: "PATCH",
           body: JSON.stringify({
@@ -210,7 +212,7 @@ describe("PATCH /api/v1/users/[username]", () => {
             "Content-Type": "application/json",
             Cookie: `session_id=${session.token}`,
           },
-        }
+        },
       );
 
       const patchResponseBody = await patchResponse.json();
@@ -224,21 +226,24 @@ describe("PATCH /api/v1/users/[username]", () => {
         created_at: patchResponseBody.created_at,
         updated_at: patchResponseBody.updated_at,
       });
+      const updatedUser = await user.findOneByEmail("newuser1@gmail.com");
+
+      expect(updatedUser).toBeDefined();
+      expect(updatedUser).toHaveProperty("email", "newuser1@gmail.com");
     });
   });
   describe("Privileged user", () => {
     test("With update:user:others targeting defaultUser", async () => {
       const privilegedUser = await orchestrator.createUser({});
-      const activatedPrivilegedUser = await orchestrator.activateUser(
-        privilegedUser
-      );
+      const activatedPrivilegedUser =
+        await orchestrator.activateUser(privilegedUser);
 
       await orchestrator.addFeaturesToUser(privilegedUser, [
         "update:user:others",
       ]);
 
       const privilegedUserSession = await orchestrator.createSession(
-        activatedPrivilegedUser.id
+        activatedPrivilegedUser,
       );
 
       const defaultUser = await orchestrator.createUser({});
@@ -247,7 +252,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       ]);
 
       const patchResponse = await fetch(
-        `http://localhost:3000/api/v1/users/${defaultUser.username}`,
+        `${webserver.origin}/api/v1/users/${defaultUser.username}`,
         {
           method: "PATCH",
           body: JSON.stringify({
@@ -257,7 +262,7 @@ describe("PATCH /api/v1/users/[username]", () => {
             "Content-Type": "application/json",
             Cookie: `session_id=${privilegedUserSession.token}`,
           },
-        }
+        },
       );
 
       const patchResponseBody = await patchResponse.json();

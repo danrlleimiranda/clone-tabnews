@@ -10,8 +10,9 @@ import activation from "models/activation";
 import authorization from "models/authorization";
 
 const router = createRouter();
-router.use(injectAnonymousOrUser);
-router.patch(canRequest("read:activation_token"), patchHandler);
+router
+  .use(injectAnonymousOrUser)
+  .patch(canRequest("read:activation_token"), patchHandler);
 
 export default router.handler({
   onNoMatch: onNoMatchHandler,
@@ -30,7 +31,7 @@ async function patchHandler(req, res) {
   const secureOutputValues = authorization.filterOutput(
     userTryingToPatch,
     "read:activation_token",
-    usedToken
+    usedToken,
   );
 
   return res.status(200).json(secureOutputValues);

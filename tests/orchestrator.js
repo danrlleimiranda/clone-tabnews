@@ -5,6 +5,7 @@ import user from "models/user";
 import { faker } from "@faker-js/faker";
 import session from "models/session";
 import activation from "models/activation";
+import webserver from "infra/webserver";
 
 const emailHttpUrl = `http://${process.env.EMAIL_SMTP_HOST}:1080`;
 // const emailHttpUrl = "http://localhost:1080";
@@ -19,7 +20,7 @@ async function waitForAllServices() {
     });
 
     async function fetchStatusPage() {
-      const response = await fetch("http://localhost:3000/api/v1/status");
+      const response = await fetch(`${webserver.origin}/api/v1/status`);
 
       if (!response.ok) {
         throw new Error();
@@ -66,8 +67,8 @@ async function createUser(userObject) {
   return createdUser;
 }
 
-async function createSession(userId) {
-  return await session.create(userId);
+async function createSession(user) {
+  return await session.create(user.id);
 }
 
 async function deleteAllMails() {
@@ -88,7 +89,7 @@ async function getLastEmail() {
   }
 
   const emailTextResponse = await fetch(
-    `${emailHttpUrl}/messages/${lastEmail.id}.plain`
+    `${emailHttpUrl}/messages/${lastEmail.id}.plain`,
   );
 
   const emailTextBody = await emailTextResponse.text();

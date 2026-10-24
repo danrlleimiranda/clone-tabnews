@@ -9,8 +9,7 @@ import authorization from "models/authorization";
 
 const router = createRouter();
 
-router.use(injectAnonymousOrUser);
-router.get(getHandler);
+router.use(injectAnonymousOrUser).get(getHandler);
 
 export default router.handler({
   onNoMatch: onNoMatchHandler,
@@ -23,7 +22,7 @@ async function getHandler(req, res) {
   const outputSecureValues = authorization.filterOutput(
     authenticatedUser,
     "read:status",
-    databaseStatus
+    databaseStatus,
   );
   return res.status(200).json(outputSecureValues);
 }

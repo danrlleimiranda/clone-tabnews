@@ -15,9 +15,10 @@ import { ForbiddenError } from "infra/errors";
 
 const router = createRouter();
 
-router.use(injectAnonymousOrUser);
-router.post(canRequest("create:session"), postHandler);
-router.delete(deleteHandler);
+router
+  .use(injectAnonymousOrUser)
+  .post(canRequest("create:session"), postHandler)
+  .delete(deleteHandler);
 
 export default router.handler({
   onNoMatch: onNoMatchHandler,
@@ -26,9 +27,9 @@ export default router.handler({
 
 async function postHandler(req, res) {
   const userInputValues = req.body;
-  const authenticatedUser = await authentication.getAuthenticatedUser(
+  const authenticatedUser = await authentication.getUser(
     userInputValues.email,
-    userInputValues.password
+    userInputValues.password,
   );
 
   if (!authorization.can(authenticatedUser, "create:session")) {
@@ -52,7 +53,7 @@ async function postHandler(req, res) {
   const secureOutputValues = authorization.filterOutput(
     authenticatedUser,
     "read:session",
-    newSession
+    newSession,
   );
 
   return res.status(201).json(secureOutputValues);
@@ -72,7 +73,7 @@ async function deleteHandler(req, res) {
   const secureOutputValues = authorization.filterOutput(
     userTryingToDelete,
     "read:session",
-    expiredSession
+    expiredSession,
   );
 
   return res.status(200).json(secureOutputValues);

@@ -12,8 +12,7 @@ import authorization from "models/authorization";
 
 const router = createRouter();
 
-router.use(injectAnonymousOrUser);
-router.get(canRequest("read:session"), getHandler);
+router.use(injectAnonymousOrUser).get(canRequest("read:session"), getHandler);
 
 export default router.handler({
   onError: onErrorHandler,
@@ -33,13 +32,13 @@ async function getHandler(req, res) {
 
   res.setHeader(
     "Cache-Control",
-    "no-store, no-cache, max-age=0, must-revalidate"
+    "no-store, no-cache, max-age=0, must-revalidate",
   );
 
   const secureOutputValues = authorization.filterOutput(
     userTryingToGet,
     "read:user:self",
-    userFound
+    userFound,
   );
 
   return res.status(200).json(secureOutputValues);

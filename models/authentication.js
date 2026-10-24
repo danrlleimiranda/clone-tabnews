@@ -2,7 +2,7 @@ import user from "models/user";
 import { UnauthorizedError } from "infra/errors";
 import password from "models/password";
 
-async function getAuthenticatedUser(providedEmail, providedPassowrd) {
+async function getUser(providedEmail, providedPassowrd) {
   let storedUser;
   try {
     storedUser = await findUserByEmail(providedEmail);
@@ -24,6 +24,7 @@ async function getAuthenticatedUser(providedEmail, providedPassowrd) {
 
       return storedUser;
     } catch (error) {
+      console.error(error);
       throw new UnauthorizedError({
         message: "Email não confere.",
         action: "Verifique se este dado está correto.",
@@ -34,7 +35,7 @@ async function getAuthenticatedUser(providedEmail, providedPassowrd) {
   async function validatePassowrd(providedPassowrd, storedPassword) {
     const correctPasswordMatch = await password.compare(
       providedPassowrd,
-      storedPassword
+      storedPassword,
     );
 
     if (!correctPasswordMatch) {
@@ -48,6 +49,6 @@ async function getAuthenticatedUser(providedEmail, providedPassowrd) {
   return storedUser;
 }
 
-const authentication = { getAuthenticatedUser };
+const authentication = { getUser };
 
 export default authentication;

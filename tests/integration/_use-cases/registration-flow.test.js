@@ -14,7 +14,7 @@ describe("Use case: Registration Flow (all successfull)", () => {
   let activatedTokenId;
 
   test("Create user account", async () => {
-    const response = await fetch("http://localhost:3000/api/v1/users", {
+    const response = await fetch(`${webserver.origin}/api/v1/users`, {
       method: "POST",
       body: JSON.stringify({
         username: "danzin",
@@ -44,7 +44,7 @@ describe("Use case: Registration Flow (all successfull)", () => {
     const activationToken = await activation.findOneValidById(token);
     activatedTokenId = token;
     expect(lastEmail.text).toContain(
-      `${webserver.origin}/cadastro/ativar/${token}`
+      `${webserver.origin}/cadastro/ativar/${token}`,
     );
 
     expect(lastEmail.sender).toBe("<contato@dantab.com.br>");
@@ -58,10 +58,10 @@ describe("Use case: Registration Flow (all successfull)", () => {
 
   test("Active account", async () => {
     const activationResponse = await fetch(
-      `http://localhost:3000/api/v1/activations/${activatedTokenId}`,
+      `${webserver.origin}/api/v1/activations/${activatedTokenId}`,
       {
         method: "PATCH",
-      }
+      },
     );
 
     expect(activationResponse.status).toBe(200);
@@ -78,19 +78,16 @@ describe("Use case: Registration Flow (all successfull)", () => {
   });
 
   test("Login", async () => {
-    const sessionResponse = await fetch(
-      `http://localhost:3000/api/v1/sessions`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          email: "danzin@gmail.com",
-          password: "senha123",
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const sessionResponse = await fetch(`${webserver.origin}/api/v1/sessions`, {
+      method: "POST",
+      body: JSON.stringify({
+        email: "danzin@gmail.com",
+        password: "senha123",
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
     expect(sessionResponse.status).toBe(201);
     const sessionResponseBody = await sessionResponse.json();

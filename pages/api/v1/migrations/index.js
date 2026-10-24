@@ -9,8 +9,8 @@ import migrator from "models/migrator";
 import authorization from "models/authorization";
 
 const router = createRouter();
-router.use(injectAnonymousOrUser);
 router
+  .use(injectAnonymousOrUser)
   .get(canRequest("read:migration"), getHandler)
   .post(canRequest("create:migration"), postHandler);
 
@@ -26,7 +26,7 @@ async function getHandler(req, res) {
   const outputSecureValues = authorization.filterOutput(
     authenticatedUser,
     "create:migration",
-    pendingMigrations
+    pendingMigrations,
   );
 
   return res.status(200).json(outputSecureValues);
@@ -43,7 +43,7 @@ async function postHandler(req, res) {
   const outputSecureValues = authorization.filterOutput(
     authenticatedUser,
     "create:migration",
-    migratedMigrations
+    migratedMigrations,
   );
 
   return res.status(200).json(outputSecureValues);

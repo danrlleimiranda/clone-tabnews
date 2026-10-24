@@ -11,9 +11,10 @@ import { ForbiddenError } from "infra/errors";
 
 const router = createRouter();
 
-router.use(injectAnonymousOrUser);
-router.get(getHandler);
-router.patch(canRequest("update:user"), patchHandler);
+router
+  .use(injectAnonymousOrUser)
+  .get(getHandler)
+  .patch(canRequest("update:user"), patchHandler);
 
 export default router.handler({
   onError: onErrorHandler,
@@ -29,7 +30,7 @@ async function getHandler(req, res) {
   const secureOutputValues = authorization.filterOutput(
     contextUser,
     "read:user",
-    userFound
+    userFound,
   );
   return res.status(200).json(secureOutputValues);
 }
@@ -53,7 +54,7 @@ async function patchHandler(req, res) {
   const secureOutputValues = authorization.filterOutput(
     userTryingToPatch,
     "read:user",
-    updatedUser
+    updatedUser,
   );
 
   return res.status(200).json(secureOutputValues);
