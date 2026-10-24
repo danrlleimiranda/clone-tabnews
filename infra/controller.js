@@ -4,18 +4,26 @@ import {
   ValidationError,
   NotFoundError,
   UnauthorizedError,
+  ForbiddenError,
 } from "infra/errors";
 import * as cookie from "cookie";
 import { EXPIRATION_IN_MILLISECONDS } from "models/session";
+import session from "models/session";
+import user from "models/user";
+import authorization from "models/authorization";
 
 export async function onErrorHandler(error, req, res) {
-  if (error instanceof ValidationError || error instanceof NotFoundError) {
+  if (
+    error instanceof ValidationError ||
+    error instanceof NotFoundError ||
+    error instanceof ForbiddenError
+  ) {
     return res.status(error.statusCode).json(error);
   }
 
   if (error instanceof UnauthorizedError) {
     clearSessionCookie(res);
-    res.status(error.statusCode).json(error);
+    return res.status(error.statusCode).json(error);
   }
 
   const publicErrorObject = new InternalServerError({
@@ -24,7 +32,7 @@ export async function onErrorHandler(error, req, res) {
 
   console.error(publicErrorObject);
 
-  res.status(publicErrorObject.statusCode).json(publicErrorObject);
+  return res.status(publicErrorObject.statusCode).json(publicErrorObject);
 }
 
 export async function onNoMatchHandler(req, res) {
@@ -52,4 +60,52 @@ export function clearSessionCookie(res) {
   });
 
   res.setHeader("Set-Cookie", setCookie);
+}
+
+export async function injectAnonymousOrUser(req, res, next) {
+  req.cookies.session_id;
+  if (req.cookies?.session_id) {
+    await injectAuthenticatedUser(req);
+    return next();
+  }
+
+  injectAnonymousUser(req);
+  return next();
+}
+
+async function injectAuthenticatedUser(req) {
+  const sessionToken = req.cookies.session_id;
+  const sessionObject = await session.findOneValidByToken(sessionToken);
+
+  const userObject = await user.findOneById(sessionObject.user_id);
+
+  req.context = { ...req.context, user: userObject };
+}
+
+function injectAnonymousUser(req) {
+  const anonymousUser = {
+    features: [
+      "read:activation_token",
+      "create:session",
+      "create:user",
+      "read:status",
+    ],
+  };
+
+  req.context = { ...req.context, user: anonymousUser };
+}
+
+export function canRequest(feature) {
+  return function can(req, _res, next) {
+    const userTryingToRequest = req.context.user;
+
+    if (authorization.can(userTryingToRequest, feature)) {
+      return next();
+    }
+
+    throw new ForbiddenError({
+      message: "Você não possui permissão para executar essa ação.",
+      action: `Verifique se o seu usuário possui a feature ${feature}`,
+    });
+  };
 }

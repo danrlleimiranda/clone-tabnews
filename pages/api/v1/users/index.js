@@ -1,10 +1,17 @@
 import { createRouter } from "next-connect";
-import { onErrorHandler, onNoMatchHandler } from "infra/controller";
+import {
+  canRequest,
+  injectAnonymousOrUser,
+  onErrorHandler,
+  onNoMatchHandler,
+} from "infra/controller";
 import user from "models/user";
+import activation from "models/activation";
+import authorization from "models/authorization";
 
 const router = createRouter();
-
-router.post(postHandler);
+router.use(injectAnonymousOrUser);
+router.post(canRequest("create:user"), postHandler);
 
 export default router.handler({
   onError: onErrorHandler,
@@ -14,6 +21,15 @@ export default router.handler({
 async function postHandler(req, res) {
   const userInputValues = req.body;
   const userResponse = await user.create(userInputValues);
+  const userTryingToPost = req.context.user;
 
-  return res.status(userResponse?.status).json(userResponse.data);
+  const activationToken = await activation.create(userResponse.id);
+  await activation.sendEmailToUser(userResponse, activationToken);
+
+  const secureOutputValues = authorization.filterOutput(
+    userTryingToPost,
+    "read:user",
+    userResponse
+  );
+  return res.status(201).json(secureOutputValues);
 }

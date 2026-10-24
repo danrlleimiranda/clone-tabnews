@@ -38,13 +38,14 @@ export class MethodNotAllowedError extends Error {
 }
 
 export class ServiceError extends Error {
-  constructor({ cause, message }) {
+  constructor({ cause, message, action, context }) {
     super(message || "Serviço indisponível no momento.", {
       cause,
     });
     this.name = "ServiceError";
-    this.action = "Verifique se o serviço está disponível.";
+    this.action = action || "Verifique se o serviço está disponível.";
     this.statusCode = 503;
+    this.context = context;
   }
 
   toJSON() {
@@ -53,6 +54,7 @@ export class ServiceError extends Error {
       message: this.message,
       action: this.action,
       status_code: this.statusCode,
+      context: this.context,
     };
   }
 }
@@ -84,6 +86,27 @@ export class NotFoundError extends Error {
       action || "Verifique se os parâmetros inseridos estão corretos.";
     this.name = "NotFoundError";
     this.statusCode = 404;
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      action: this.action,
+      message: this.message,
+      cause: this.cause,
+      status_code: this.statusCode,
+    };
+  }
+}
+export class ForbiddenError extends Error {
+  constructor({ cause, message, action }) {
+    super(message || "Acesso negado", {
+      cause,
+    });
+    this.action =
+      action || "Verifique as features necessárias antes de continuar.";
+    this.name = "ForbiddenError";
+    this.statusCode = 403;
   }
 
   toJSON() {

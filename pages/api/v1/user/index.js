@@ -3,13 +3,17 @@ import {
   onErrorHandler,
   onNoMatchHandler,
   setSessionCookie,
+  canRequest,
+  injectAnonymousOrUser,
 } from "infra/controller";
 import session from "models/session";
 import user from "models/user";
+import authorization from "models/authorization";
 
 const router = createRouter();
 
-router.get(getHandler);
+router.use(injectAnonymousOrUser);
+router.get(canRequest("read:session"), getHandler);
 
 export default router.handler({
   onError: onErrorHandler,
@@ -18,7 +22,7 @@ export default router.handler({
 
 async function getHandler(req, res) {
   const sessionToken = req.cookies.session_id;
-
+  const userTryingToGet = req.context.user;
   const sessionObject = await session.findOneValidByToken(sessionToken);
 
   const renewedSessionObject = await session.renew(sessionToken);
@@ -32,5 +36,11 @@ async function getHandler(req, res) {
     "no-store, no-cache, max-age=0, must-revalidate"
   );
 
-  return res.status(200).json(userFound);
+  const secureOutputValues = authorization.filterOutput(
+    userTryingToGet,
+    "read:user:self",
+    userFound
+  );
+
+  return res.status(200).json(secureOutputValues);
 }
