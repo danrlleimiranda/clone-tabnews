@@ -12,8 +12,7 @@ import authorization from "models/authorization";
 
 const router = createRouter();
 
-router.use(injectAnonymousOrUser);
-router.get(canRequest("read:session"), getHandler);
+router.use(injectAnonymousOrUser).get(canRequest("read:session"), getHandler);
 
 export default router.handler({
   onError: onErrorHandler,

@@ -15,9 +15,10 @@ import { ForbiddenError } from "infra/errors";
 
 const router = createRouter();
 
-router.use(injectAnonymousOrUser);
-router.post(canRequest("create:session"), postHandler);
-router.delete(deleteHandler);
+router
+  .use(injectAnonymousOrUser)
+  .post(canRequest("create:session"), postHandler)
+  .delete(deleteHandler);
 
 export default router.handler({
   onNoMatch: onNoMatchHandler,

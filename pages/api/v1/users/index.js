@@ -9,9 +9,9 @@ import user from "models/user";
 import activation from "models/activation";
 import authorization from "models/authorization";
 
-const router = createRouter();
-router.use(injectAnonymousOrUser);
-router.post(canRequest("create:user"), postHandler);
+const router = createRouter()
+  .use(injectAnonymousOrUser)
+  .post(canRequest("create:user"), postHandler);
 
 export default router.handler({
   onError: onErrorHandler,

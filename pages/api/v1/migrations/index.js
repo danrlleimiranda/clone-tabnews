@@ -9,8 +9,8 @@ import migrator from "models/migrator";
 import authorization from "models/authorization";
 
 const router = createRouter();
-router.use(injectAnonymousOrUser);
 router
+  .use(injectAnonymousOrUser)
   .get(canRequest("read:migration"), getHandler)
   .post(canRequest("create:migration"), postHandler);
 

@@ -9,8 +9,7 @@ import authorization from "models/authorization";
 
 const router = createRouter();
 
-router.use(injectAnonymousOrUser);
-router.get(getHandler);
+router.use(injectAnonymousOrUser).get(getHandler);
 
 export default router.handler({
   onNoMatch: onNoMatchHandler,

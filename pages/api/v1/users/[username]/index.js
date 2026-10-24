@@ -11,9 +11,10 @@ import { ForbiddenError } from "infra/errors";
 
 const router = createRouter();
 
-router.use(injectAnonymousOrUser);
-router.get(getHandler);
-router.patch(canRequest("update:user"), patchHandler);
+router
+  .use(injectAnonymousOrUser)
+  .get(getHandler)
+  .patch(canRequest("update:user"), patchHandler);
 
 export default router.handler({
   onError: onErrorHandler,

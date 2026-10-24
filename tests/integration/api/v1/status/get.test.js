@@ -8,7 +8,7 @@ beforeAll(async () => {
 
 describe("GET /api/v1/status", () => {
   describe("Anonymous user", () => {
-    test("Retrieving application status", async () => {
+    test("Running application status", async () => {
       const response = await fetch(`${webserver.origin}/api/v1/status`);
 
       expect(response.status).toBe(200);
@@ -24,7 +24,7 @@ describe("GET /api/v1/status", () => {
   });
 
   describe("Privileged user", () => {
-    test("Retrieving application status", async () => {
+    test("Running application status", async () => {
       const createdUser = await orchestrator.createUser({});
 
       const activatedUser = await orchestrator.activateUser(createdUser);

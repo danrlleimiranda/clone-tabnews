@@ -6,7 +6,7 @@ beforeAll(async () => {
 
 describe("POST /api/v1/status", () => {
   describe("Anonymous user", () => {
-    test("Retrieving application status", async () => {
+    test("Running application status", async () => {
       const response = await fetch(`${webserver.origin}/api/v1/status`, {
         method: "POST",
       });
