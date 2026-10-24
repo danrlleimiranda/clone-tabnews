@@ -1,4 +1,5 @@
 import orchestrator from "tests/orchestrator";
+import webserver from "infra/webserver";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -10,7 +11,7 @@ describe("PATCH /api/v1/users/[username]", () => {
   describe("Anonymous user", () => {
     test("Can't a update a user", async () => {
       const patchResponse = await fetch(
-        "http://localhost:3000/api/v1/users/newuser",
+        `${webserver.origin}/api/v1/users/newuser`,
         {
           method: "PATCH",
           body: JSON.stringify({
@@ -44,7 +45,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       const session = await orchestrator.createSession(activatedUser.id);
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/${username}`,
+        `${webserver.origin}/api/v1/users/${username}`,
         {
           method: "PATCH",
           headers: {
@@ -81,7 +82,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       const session2 = await orchestrator.createSession(activatedUser2.id);
 
       const patchResponse = await fetch(
-        "http://localhost:3000/api/v1/users/user2",
+        `${webserver.origin}/api/v1/users/user2`,
         {
           method: "PATCH",
           body: JSON.stringify({
@@ -124,7 +125,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       const session2 = await orchestrator.createSession(activatedUser2.id);
 
       const patchResponse = await fetch(
-        "http://localhost:3000/api/v1/users/usera",
+        `${webserver.origin}/api/v1/users/usera`,
         {
           method: "PATCH",
           body: JSON.stringify({
@@ -163,7 +164,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       const session2 = await orchestrator.createSession(activatedUser2.id);
 
       const patchResponse = await fetch(
-        `http://localhost:3000/api/v1/users/${createduser2.username}`,
+        `${webserver.origin}/api/v1/users/${createduser2.username}`,
         {
           method: "PATCH",
           body: JSON.stringify({
@@ -199,7 +200,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       const session = await orchestrator.createSession(activatedUser.id);
 
       const patchResponse = await fetch(
-        "http://localhost:3000/api/v1/users/newuser",
+        `${webserver.origin}/api/v1/users/newuser`,
         {
           method: "PATCH",
           body: JSON.stringify({
@@ -247,7 +248,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       ]);
 
       const patchResponse = await fetch(
-        `http://localhost:3000/api/v1/users/${defaultUser.username}`,
+        `${webserver.origin}/api/v1/users/${defaultUser.username}`,
         {
           method: "PATCH",
           body: JSON.stringify({

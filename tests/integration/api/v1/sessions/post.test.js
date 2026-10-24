@@ -2,6 +2,8 @@ import { EXPIRATION_IN_MILLISECONDS } from "models/session";
 import orchestrator from "tests/orchestrator";
 import { version } from "uuid";
 import setCookieParser from "set-cookie-parser";
+import webserver from "infra/webserver";
+
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
   await orchestrator.clearDatabase();
@@ -15,7 +17,7 @@ describe("POST /api/v1/sessions", () => {
         password: "senhacorreta",
       });
 
-      const response = await fetch("http://localhost:3000/api/v1/sessions", {
+      const response = await fetch(`${webserver.origin}/api/v1/sessions`, {
         method: "POST",
         body: JSON.stringify({
           email: "email.errado@gmail.com",
@@ -43,7 +45,7 @@ describe("POST /api/v1/sessions", () => {
         email: "email.correto@email.com",
       });
 
-      const response = await fetch("http://localhost:3000/api/v1/sessions", {
+      const response = await fetch(`${webserver.origin}/api/v1/sessions`, {
         method: "POST",
         body: JSON.stringify({
           email: "email.correto@email.com",
@@ -69,7 +71,7 @@ describe("POST /api/v1/sessions", () => {
     test("With incorrect password and incorrect email", async () => {
       await orchestrator.createUser({});
 
-      const response = await fetch("http://localhost:3000/api/v1/sessions", {
+      const response = await fetch(`${webserver.origin}/api/v1/sessions`, {
         method: "POST",
         body: JSON.stringify({
           email: "email.incorreta@email.com",
@@ -100,7 +102,7 @@ describe("POST /api/v1/sessions", () => {
 
       await orchestrator.activateUser(createdUser);
 
-      const response = await fetch("http://localhost:3000/api/v1/sessions", {
+      const response = await fetch(`${webserver.origin}/api/v1/sessions`, {
         method: "POST",
         body: JSON.stringify({
           email: "tudo.correto@email.com",

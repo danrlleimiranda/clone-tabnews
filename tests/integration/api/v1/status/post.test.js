@@ -1,5 +1,5 @@
 import orchestrator from "tests/orchestrator";
-
+import webserver from "infra/webserver";
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
 });
@@ -7,7 +7,7 @@ beforeAll(async () => {
 describe("POST /api/v1/status", () => {
   describe("Anonymous user", () => {
     test("Retrieving application status", async () => {
-      const response = await fetch("http://localhost:3000/api/v1/status", {
+      const response = await fetch(`${webserver.origin}/api/v1/status`, {
         method: "POST",
       });
 
