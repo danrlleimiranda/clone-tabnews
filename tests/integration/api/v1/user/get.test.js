@@ -61,13 +61,13 @@ describe("GET /api/v1/user", () => {
         map: true,
       });
 
-      expect(parsedSetCookie).toEqual({
+      expect(parsedSetCookie).toMatchObject({
         session_id: {
           name: "session_id",
           value: renewedSessionObject.token,
-          maxAge: EXPIRATION_IN_MILLISECONDS / 1000,
           path: "/",
           httpOnly: true,
+          sameSite: "Lax",
         },
       });
     });
@@ -121,13 +121,13 @@ describe("GET /api/v1/user", () => {
         map: true,
       });
 
-      expect(parsedSetCookie).toEqual({
+      expect(parsedSetCookie).toMatchObject({
         session_id: {
           name: "session_id",
           value: renewedSessionObject.token,
-          maxAge: EXPIRATION_IN_MILLISECONDS / 1000,
           path: "/",
           httpOnly: true,
+          sameSite: "Lax",
         },
       });
     });

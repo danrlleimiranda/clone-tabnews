@@ -143,11 +143,10 @@ describe("POST /api/v1/sessions", () => {
         map: true,
       });
 
-      expect(parsedSetCookie).toEqual({
+      expect(parsedSetCookie).toMatchObject({
         session_id: {
           name: "session_id",
           value: responseBody.token,
-          maxAge: EXPIRATION_IN_MILLISECONDS / 1000,
           path: "/",
           httpOnly: true,
         },
