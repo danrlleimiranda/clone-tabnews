@@ -67,8 +67,8 @@ async function createUser(userObject) {
   return createdUser;
 }
 
-async function createSession(userId) {
-  return await session.create(userId);
+async function createSession(user) {
+  return await session.create(user.id);
 }
 
 async function deleteAllMails() {

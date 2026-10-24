@@ -169,7 +169,7 @@ describe("PATCH /api/v1/activations/[token_id]", () => {
 
       const activated = await orchestrator.activateUser(user1);
 
-      const user1Session = await orchestrator.createSession(activated.id);
+      const user1Session = await orchestrator.createSession(activated);
 
       const user2 = await orchestrator.createUser({});
 

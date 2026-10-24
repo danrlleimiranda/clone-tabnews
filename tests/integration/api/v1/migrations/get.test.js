@@ -34,8 +34,9 @@ describe("GET /api/v1/migrations", () => {
       const updatedUser = await orchestrator.addFeaturesToUser(activatedUser, [
         "read:migration",
       ]);
+      console.log(updatedUser);
 
-      const sessionObject = await orchestrator.createSession(updatedUser.id);
+      const sessionObject = await orchestrator.createSession(updatedUser);
 
       const response = await fetch(`${webserver.origin}/api/v1/migrations`, {
         method: "GET",

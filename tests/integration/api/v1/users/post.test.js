@@ -122,7 +122,7 @@ describe("POST /api/v1/users", () => {
 
       const activated = await orchestrator.activateUser(user1);
 
-      const user1Session = await orchestrator.createSession(activated.id);
+      const user1Session = await orchestrator.createSession(activated);
 
       const user2Response = await fetch(`${webserver.origin}/api/v1/users`, {
         method: "POST",

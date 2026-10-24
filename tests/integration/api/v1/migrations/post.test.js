@@ -57,7 +57,7 @@ describe("POST /api/v1/migrations", () => {
           ["create:migration"]
         );
 
-        const sessionObject = await orchestrator.createSession(updatedUser.id);
+        const sessionObject = await orchestrator.createSession(updatedUser);
 
         const response = await fetch(`${webserver.origin}/api/v1/migrations`, {
           method: "POST",
@@ -82,7 +82,7 @@ describe("POST /api/v1/migrations", () => {
           ["create:migration"]
         );
 
-        const sessionObject = await orchestrator.createSession(updatedUser.id);
+        const sessionObject = await orchestrator.createSession(updatedUser);
 
         const response2 = await fetch(`${webserver.origin}/api/v1/migrations`, {
           method: "POST",

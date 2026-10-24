@@ -3,12 +3,13 @@ import orchestrator from "tests/orchestrator";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
+  await orchestrator.clearDatabase();
   await orchestrator.runPendingMigrations();
 });
 
 describe("GET /api/v1/status", () => {
   describe("Anonymous user", () => {
-    test("Running application status", async () => {
+    test("Retrieving application status", async () => {
       const response = await fetch(`${webserver.origin}/api/v1/status`);
 
       expect(response.status).toBe(200);
@@ -24,7 +25,7 @@ describe("GET /api/v1/status", () => {
   });
 
   describe("Privileged user", () => {
-    test("Running application status", async () => {
+    test("Retrieving application status", async () => {
       const createdUser = await orchestrator.createUser({});
 
       const activatedUser = await orchestrator.activateUser(createdUser);
@@ -33,7 +34,7 @@ describe("GET /api/v1/status", () => {
         "read:status:all",
       ]);
 
-      const sessionObject = await orchestrator.createSession(updatedUser.id);
+      const sessionObject = await orchestrator.createSession(updatedUser);
 
       const response = await fetch(`${webserver.origin}/api/v1/status`, {
         method: "GET",
