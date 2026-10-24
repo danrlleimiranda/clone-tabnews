@@ -22,7 +22,7 @@ async function getHandler(req, res) {
   const outputSecureValues = authorization.filterOutput(
     authenticatedUser,
     "read:status",
-    databaseStatus
+    databaseStatus,
   );
   return res.status(200).json(outputSecureValues);
 }

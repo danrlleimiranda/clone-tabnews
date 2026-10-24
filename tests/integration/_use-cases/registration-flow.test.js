@@ -44,7 +44,7 @@ describe("Use case: Registration Flow (all successfull)", () => {
     const activationToken = await activation.findOneValidById(token);
     activatedTokenId = token;
     expect(lastEmail.text).toContain(
-      `${webserver.origin}/cadastro/ativar/${token}`
+      `${webserver.origin}/cadastro/ativar/${token}`,
     );
 
     expect(lastEmail.sender).toBe("<contato@dantab.com.br>");
@@ -61,7 +61,7 @@ describe("Use case: Registration Flow (all successfull)", () => {
       `${webserver.origin}/api/v1/activations/${activatedTokenId}`,
       {
         method: "PATCH",
-      }
+      },
     );
 
     expect(activationResponse.status).toBe(200);

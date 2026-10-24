@@ -89,7 +89,7 @@ async function getLastEmail() {
   }
 
   const emailTextResponse = await fetch(
-    `${emailHttpUrl}/messages/${lastEmail.id}.plain`
+    `${emailHttpUrl}/messages/${lastEmail.id}.plain`,
   );
 
   const emailTextBody = await emailTextResponse.text();

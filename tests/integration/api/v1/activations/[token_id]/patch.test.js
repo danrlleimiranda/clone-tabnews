@@ -17,7 +17,7 @@ describe("PATCH /api/v1/activations/[token_id]", () => {
         `${webserver.origin}/api/v1/activations/44761ae0-b9b5-4cbb-a388-2fab9b2670af`,
         {
           method: "PATCH",
-        }
+        },
       );
 
       expect(response.status).toBe(404);
@@ -51,7 +51,7 @@ describe("PATCH /api/v1/activations/[token_id]", () => {
         `${webserver.origin}/api/v1/activations/${expiredActivationToken.id}`,
         {
           method: "PATCH",
-        }
+        },
       );
 
       const patchResponseBody = await patchResponse.json();
@@ -75,7 +75,7 @@ describe("PATCH /api/v1/activations/[token_id]", () => {
         `${webserver.origin}/api/v1/activations/${activationToken.id}`,
         {
           method: "PATCH",
-        }
+        },
       );
 
       expect(response1.status).toBe(200);
@@ -84,7 +84,7 @@ describe("PATCH /api/v1/activations/[token_id]", () => {
         `${webserver.origin}/api/v1/activations/${activationToken.id}`,
         {
           method: "PATCH",
-        }
+        },
       );
 
       const response2Body = await response2.json();
@@ -108,7 +108,7 @@ describe("PATCH /api/v1/activations/[token_id]", () => {
         `${webserver.origin}/api/v1/activations/${activationToken.id}`,
         {
           method: "PATCH",
-        }
+        },
       );
 
       const patchResponseBody = await patchResponse.json();
@@ -149,7 +149,7 @@ describe("PATCH /api/v1/activations/[token_id]", () => {
         `${webserver.origin}/api/v1/activations/${activationToken.id}`,
         {
           method: "PATCH",
-        }
+        },
       );
 
       const patchResponseBody = await patchResponse.json();
@@ -182,7 +182,7 @@ describe("PATCH /api/v1/activations/[token_id]", () => {
           headers: {
             Cookie: `session_id=${user1Session.token}`,
           },
-        }
+        },
       );
 
       const patchResponseBody = await patchResponse.json();

@@ -26,7 +26,7 @@ async function getHandler(req, res) {
   const outputSecureValues = authorization.filterOutput(
     authenticatedUser,
     "create:migration",
-    pendingMigrations
+    pendingMigrations,
   );
 
   return res.status(200).json(outputSecureValues);
@@ -43,7 +43,7 @@ async function postHandler(req, res) {
   const outputSecureValues = authorization.filterOutput(
     authenticatedUser,
     "create:migration",
-    migratedMigrations
+    migratedMigrations,
   );
 
   return res.status(200).json(outputSecureValues);

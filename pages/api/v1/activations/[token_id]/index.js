@@ -31,7 +31,7 @@ async function patchHandler(req, res) {
   const secureOutputValues = authorization.filterOutput(
     userTryingToPatch,
     "read:activation_token",
-    usedToken
+    usedToken,
   );
 
   return res.status(200).json(secureOutputValues);

@@ -18,7 +18,7 @@ describe("GET /api/v1/users/[username]", () => {
       });
       const username = "mesmocase";
       const response2 = await fetch(
-        `${webserver.origin}/api/v1/users/${username}`
+        `${webserver.origin}/api/v1/users/${username}`,
       );
 
       expect(response2.status).toBe(200);
@@ -47,7 +47,7 @@ describe("GET /api/v1/users/[username]", () => {
 
       const username = "casediferente";
       const response2 = await fetch(
-        `${webserver.origin}/api/v1/users/${username}`
+        `${webserver.origin}/api/v1/users/${username}`,
       );
 
       expect(response2.status).toBe(200);
@@ -70,7 +70,7 @@ describe("GET /api/v1/users/[username]", () => {
     test("With nonexistent username", async () => {
       const username = "nonexistent";
       const response = await fetch(
-        `${webserver.origin}/api/v1/users/${username}`
+        `${webserver.origin}/api/v1/users/${username}`,
       );
 
       expect(response.status).toBe(404);

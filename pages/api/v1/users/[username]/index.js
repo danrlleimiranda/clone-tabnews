@@ -30,7 +30,7 @@ async function getHandler(req, res) {
   const secureOutputValues = authorization.filterOutput(
     contextUser,
     "read:user",
-    userFound
+    userFound,
   );
   return res.status(200).json(secureOutputValues);
 }
@@ -54,7 +54,7 @@ async function patchHandler(req, res) {
   const secureOutputValues = authorization.filterOutput(
     userTryingToPatch,
     "read:user",
-    updatedUser
+    updatedUser,
   );
 
   return res.status(200).json(secureOutputValues);

@@ -24,6 +24,7 @@ async function getUser(providedEmail, providedPassowrd) {
 
       return storedUser;
     } catch (error) {
+      console.error(error);
       throw new UnauthorizedError({
         message: "Email não confere.",
         action: "Verifique se este dado está correto.",
@@ -34,7 +35,7 @@ async function getUser(providedEmail, providedPassowrd) {
   async function validatePassowrd(providedPassowrd, storedPassword) {
     const correctPasswordMatch = await password.compare(
       providedPassowrd,
-      storedPassword
+      storedPassword,
     );
 
     if (!correctPasswordMatch) {

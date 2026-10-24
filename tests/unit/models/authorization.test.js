@@ -15,7 +15,7 @@ describe("models/authorization.js", () => {
     test("with unknown features", async () => {
       const createdUser = await orchestrator.createUser({});
       expect(() => authorization.can(createdUser, "unknown:feature")).toThrow(
-        InternalServerError
+        InternalServerError,
       );
     });
 
@@ -37,7 +37,7 @@ describe("models/authorization.js", () => {
     test("with valid user but no resource", async () => {
       const createdUser = await orchestrator.createUser({});
       expect(() =>
-        authorization.filterOutput(createdUser, "read:user")
+        authorization.filterOutput(createdUser, "read:user"),
       ).toThrow(InternalServerError);
     });
 
@@ -55,7 +55,7 @@ describe("models/authorization.js", () => {
       const results = authorization.filterOutput(
         createdUser,
         "read:user",
-        resource
+        resource,
       );
       expect(results).toEqual({
         id: 1,

@@ -22,7 +22,7 @@ describe("PATCH /api/v1/users/[username]", () => {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       const patchResponseBody = await patchResponse.json();
@@ -52,7 +52,7 @@ describe("PATCH /api/v1/users/[username]", () => {
           headers: {
             Cookie: `session_id=${session.token}`,
           },
-        }
+        },
       );
 
       expect(response.status).toBe(404);
@@ -93,7 +93,7 @@ describe("PATCH /api/v1/users/[username]", () => {
             "Content-Type": "application/json",
             Cookie: `session_id=${session2.token}`,
           },
-        }
+        },
       );
 
       const patchResponseBody = await patchResponse.json();
@@ -136,7 +136,7 @@ describe("PATCH /api/v1/users/[username]", () => {
             "Content-Type": "application/json",
             Cookie: `session_id=${session2.token}`,
           },
-        }
+        },
       );
 
       const patchResponseBody = await patchResponse.json();
@@ -175,7 +175,7 @@ describe("PATCH /api/v1/users/[username]", () => {
             "Content-Type": "application/json",
             Cookie: `session_id=${session2.token}`,
           },
-        }
+        },
       );
 
       const patchResponseBody = await patchResponse.json();
@@ -212,7 +212,7 @@ describe("PATCH /api/v1/users/[username]", () => {
             "Content-Type": "application/json",
             Cookie: `session_id=${session.token}`,
           },
-        }
+        },
       );
 
       const patchResponseBody = await patchResponse.json();
@@ -235,16 +235,15 @@ describe("PATCH /api/v1/users/[username]", () => {
   describe("Privileged user", () => {
     test("With update:user:others targeting defaultUser", async () => {
       const privilegedUser = await orchestrator.createUser({});
-      const activatedPrivilegedUser = await orchestrator.activateUser(
-        privilegedUser
-      );
+      const activatedPrivilegedUser =
+        await orchestrator.activateUser(privilegedUser);
 
       await orchestrator.addFeaturesToUser(privilegedUser, [
         "update:user:others",
       ]);
 
       const privilegedUserSession = await orchestrator.createSession(
-        activatedPrivilegedUser
+        activatedPrivilegedUser,
       );
 
       const defaultUser = await orchestrator.createUser({});
@@ -263,7 +262,7 @@ describe("PATCH /api/v1/users/[username]", () => {
             "Content-Type": "application/json",
             Cookie: `session_id=${privilegedUserSession.token}`,
           },
-        }
+        },
       );
 
       const patchResponseBody = await patchResponse.json();

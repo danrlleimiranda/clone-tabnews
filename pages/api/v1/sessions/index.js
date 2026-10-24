@@ -29,7 +29,7 @@ async function postHandler(req, res) {
   const userInputValues = req.body;
   const authenticatedUser = await authentication.getUser(
     userInputValues.email,
-    userInputValues.password
+    userInputValues.password,
   );
 
   if (!authorization.can(authenticatedUser, "create:session")) {
@@ -53,7 +53,7 @@ async function postHandler(req, res) {
   const secureOutputValues = authorization.filterOutput(
     authenticatedUser,
     "read:session",
-    newSession
+    newSession,
   );
 
   return res.status(201).json(secureOutputValues);
@@ -73,7 +73,7 @@ async function deleteHandler(req, res) {
   const secureOutputValues = authorization.filterOutput(
     userTryingToDelete,
     "read:session",
-    expiredSession
+    expiredSession,
   );
 
   return res.status(200).json(secureOutputValues);

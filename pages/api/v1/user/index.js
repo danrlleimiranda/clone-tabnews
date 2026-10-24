@@ -32,13 +32,13 @@ async function getHandler(req, res) {
 
   res.setHeader(
     "Cache-Control",
-    "no-store, no-cache, max-age=0, must-revalidate"
+    "no-store, no-cache, max-age=0, must-revalidate",
   );
 
   const secureOutputValues = authorization.filterOutput(
     userTryingToGet,
     "read:user:self",
-    userFound
+    userFound,
   );
 
   return res.status(200).json(secureOutputValues);
